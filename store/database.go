@@ -10,15 +10,15 @@ import (
 	"github.com/rombintu/timeshibot-backend/tools"
 )
 
-type Database struct {
+type Store struct {
 	Driver *gorm.DB
 }
 
-func NewDatabase() *Database {
-	return &Database{}
+func NewStore() *Store {
+	return &Store{}
 }
 
-func (d *Database) Open() error {
+func (s *Store) Open() error {
 	if tools.GetEnvOrDefaultBool("PROD") {
 		dsn := fmt.Sprintf(
 			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
@@ -33,17 +33,13 @@ func (d *Database) Open() error {
 		if err != nil {
 			return err
 		}
-		d.Driver = db
+		s.Driver = db
 	} else {
 		db, err := gorm.Open(sqlite.Open(tools.DefaultDevDatabase), &gorm.Config{})
 		if err != nil {
 			return err
 		}
-		d.Driver = db
+		s.Driver = db
 	}
 	return nil
 }
-
-// func (d *Database) Close() error {
-// 	return d.Driver.Close()
-// }

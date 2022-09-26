@@ -14,12 +14,36 @@ func (s *Server) Group() gin.HandlerFunc {
 		action := c.Param("action")
 
 		if action == "create" {
-			if err := s.Database.CreateGroup(chatID); err != nil {
-				s.respondWithError(c, 500, err)
+			if err := s.Store.CreateGroup(chatID); err != nil {
+				c.JSON(http.StatusInternalServerError, store.REST{
+					Message: err.Error(), Error: 1},
+				)
 				return
 			}
+		} else if action == "get" {
+			group, err := s.Store.GetGroup(chatID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, store.REST{
+					Message: err.Error(), Error: 1},
+				)
+				return
+			}
+			c.JSON(http.StatusOK, group)
+			return
+		} else if action == "all" {
+			groups, err := s.Store.GetGroupAll(chatID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, store.REST{
+					Message: err.Error(), Error: 1},
+				)
+				return
+			}
+			c.JSON(http.StatusOK, groups)
+			return
 		} else {
-			s.respondWithError(c, 404, tools.NotFound)
+			c.JSON(http.StatusBadGateway, store.REST{
+				Message: tools.NotFound, Error: 1},
+			)
 			return
 		}
 

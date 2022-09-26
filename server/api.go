@@ -9,25 +9,25 @@ import (
 )
 
 type Server struct {
-	Router   *gin.Engine
-	Database *store.Database
+	Router *gin.Engine
+	Store  *store.Store
 }
 
 func NewServer() *Server {
 	return &Server{
-		Router:   gin.Default(),
-		Database: store.NewDatabase(),
+		Router: gin.Default(),
+		Store:  store.NewStore(),
 	}
 }
 
 func (s *Server) Start() error {
-	if err := s.ConfigureDatabase(); err != nil {
+	if err := s.ConfigureStore(); err != nil {
 		return err
 	}
 	s.ConfigureRouter()
 
 	return http.ListenAndServe(
-		tools.GetEnvOrDefault("PORT", tools.DefaultServerPort),
+		tools.GetEnvOrDefault("PORT", tools.DefaultPortServer),
 		s.Router,
 	)
 }
@@ -38,13 +38,13 @@ func (s *Server) ConfigureRouter() {
 	s.Router.POST("/:chat_id/:week/:day", s.UpdateDay())
 }
 
-func (s *Server) ConfigureDatabase() error {
-	if err := s.Database.Open(); err != nil {
+func (s *Server) ConfigureStore() error {
+	if err := s.Store.Open(); err != nil {
 		return err
 	}
-	if err := s.Database.Driver.AutoMigrate(
+	if err := s.Store.Driver.AutoMigrate(
 		&store.Group{},
-		&store.TimeTable{},
+		&store.Week{},
 		&store.Day{},
 		&store.Subject{},
 	); err != nil {

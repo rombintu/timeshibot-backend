@@ -1,7 +1,7 @@
 package tools
 
 const (
-	DefaultServerPort  string = ":7000"
+	DefaultPortServer  string = ":7000"
 	DefaultDevDatabase string = "sqlite.db" // file::memory:?cache=shared --- in memory
 	// DefaultDevDatabase  string = "file::memory:?cache=shared"
 	DefaultHost         string = "localhost"
