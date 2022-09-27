@@ -34,8 +34,8 @@ func (s *Server) Start() error {
 
 func (s *Server) ConfigureRouter() {
 	s.Router.GET("/", s.Index())
-	s.Router.GET("/:chat_id/:action", s.Group())
-	s.Router.POST("/:chat_id/:week/:day", s.UpdateDay())
+	s.Router.GET("/:chat_id/:week/:day/:action", s.Timetable())
+	// s.Router.POST("/:chat_id/:week/:day", s.UpdateDay())
 }
 
 func (s *Server) ConfigureStore() error {
@@ -43,9 +43,7 @@ func (s *Server) ConfigureStore() error {
 		return err
 	}
 	if err := s.Store.Driver.AutoMigrate(
-		&store.Group{},
-		&store.Week{},
-		&store.Day{},
+		&store.Timetable{},
 		&store.Subject{},
 	); err != nil {
 		return err

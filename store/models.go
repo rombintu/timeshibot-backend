@@ -7,19 +7,11 @@ type REST struct {
 	Error   int    `json:"error"`
 }
 
-type Group struct {
+type Timetable struct {
 	gorm.Model
-	ChatID string `json:"chat_id" gorm:"unique"`
-	Weeks  []Week `gorm:"foreignKey:ID"`
-}
-
-type Week struct {
-	gorm.Model
-	Days []Day `gorm:"foreignKey:ID"`
-}
-
-type Day struct {
-	gorm.Model
+	ChatID   string
+	Name     string
+	Week     string
 	Subjects []Subject `gorm:"foreignKey:ID"`
 }
 
