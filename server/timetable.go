@@ -8,7 +8,7 @@ import (
 	"github.com/rombintu/timeshibot-backend/tools"
 )
 
-func (s *Server) TimetableGET() gin.HandlerFunc {
+func (s *Server) TimetableGET() gin.HandlerFunc { // TODO
 	return func(c *gin.Context) {
 		chatID := c.Param("chat_id")
 		week := c.Param("week")
@@ -31,16 +31,16 @@ func (s *Server) TimetableGET() gin.HandlerFunc {
 			}
 			c.JSON(http.StatusOK, tts)
 			return
-		case tools.All: // DEV
-			tts, err := s.Store.GetTimeTableAll()
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, store.REST{
-					Message: err.Error(), Error: 1},
-				)
-				return
-			}
-			c.JSON(http.StatusOK, tts)
-			return
+		// case tools.All: // DEV
+		// 	tts, err := s.Store.GetTimeTableAll()
+		// 	if err != nil {
+		// 		c.JSON(http.StatusInternalServerError, store.REST{
+		// 			Message: err.Error(), Error: 1},
+		// 		)
+		// 		return
+		// 	}
+		// 	c.JSON(http.StatusOK, tts)
+		// 	return
 		default:
 			c.JSON(http.StatusBadGateway, store.REST{
 				Message: tools.NotFound, Error: 1},
