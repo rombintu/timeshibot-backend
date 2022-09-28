@@ -1,5 +1,6 @@
 package store
 
+// API-backend for create or update TimeTable record
 func (s *Store) CreateOrUpdateTimeTable(ttFind Timetable, subjects []Subject) error {
 	// TODO
 	var tt Timetable
@@ -16,9 +17,10 @@ func (s *Store) CreateOrUpdateTimeTable(ttFind Timetable, subjects []Subject) er
 	return nil
 }
 
-func (s *Store) GetTimeTable(ttFind Timetable) ([]Subject, error) {
+// API-backend for get Subjects records by TimeTable.ChatID
+func (s *Store) GetTimeTable(ttFind Timetable) (Timetable, error) {
 	if err := s.Open(); err != nil {
-		return []Subject{}, err
+		return Timetable{}, err
 	}
 
 	var tt Timetable
@@ -28,17 +30,19 @@ func (s *Store) GetTimeTable(ttFind Timetable) ([]Subject, error) {
 		Where(
 			"chat_id == ? AND name == ? AND week == ?",
 			ttFind.ChatID, ttFind.Name, ttFind.Week).Error; err != nil {
-		return []Subject{}, err
+		return Timetable{}, err
 	}
 
 	if err := s.Driver.Find(&subjects).
 		Order("time DESC"). // TODO
 		Where("tt_id == ?", tt.ID).
 		Error; err != nil {
-		return []Subject{}, err
+		return Timetable{}, err
 	}
 
-	return subjects, nil
+	tt.Subjects = subjects
+
+	return tt, nil
 }
 
 func (s *Store) GetTimeTableAll() ([]Timetable, error) {

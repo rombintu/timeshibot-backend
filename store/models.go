@@ -17,6 +17,7 @@ type Timetable struct {
 	Name     string
 	Week     string
 	Subjects []Subject `gorm:"foreignKey:TTID;"`
+	Comment  string    `json:"comment"`
 }
 
 type Subject struct {
@@ -26,4 +27,5 @@ type Subject struct {
 	Title   string    `json:"title"`
 	Office  string    `json:"office"`
 	Teacher string    `json:"teacher"`
+	Comment string    `json:"comment"`
 }
