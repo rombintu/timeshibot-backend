@@ -34,8 +34,8 @@ func (s *Server) Start() error {
 
 func (s *Server) ConfigureRouter() {
 	s.Router.GET("/", s.Index())
-	s.Router.GET("/:chat_id/:week/:day/:action", s.Timetable())
-	// s.Router.POST("/:chat_id/:week/:day", s.UpdateDay())
+	s.Router.GET("/:chat_id/:week/:day/:action", s.TimetableGET())
+	s.Router.POST("/:chat_id/:week/:day/:action", s.TimetablePOST())
 }
 
 func (s *Server) ConfigureStore() error {

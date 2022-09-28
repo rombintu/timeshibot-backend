@@ -1,38 +1,55 @@
 package store
 
-func (s *Store) CreateGroup(chatID string) error {
-	tt := &Timetable{
-		ChatID: chatID,
-	}
-
-	if err := s.Driver.Create(tt).Error; err != nil {
+func (s *Store) CreateOrUpdateTimeTable(ttFind Timetable, subjects []Subject) error {
+	// TODO
+	var tt Timetable
+	if err := s.Driver.
+		FirstOrCreate(&tt, ttFind).Error; err != nil {
 		return err
 	}
+	if err := s.Driver.Unscoped().Delete(&Subject{}, Subject{TTID: tt.ID}).Error; err != nil {
+		return err
+	}
+	tt.Subjects = subjects
+	s.Driver.Save(&tt)
+
 	return nil
 }
 
-func (s *Store) GetGroup(chatID string) (Timetable, error) {
+func (s *Store) GetTimeTable(ttFind Timetable) ([]Subject, error) {
 	if err := s.Open(); err != nil {
-		return Timetable{}, err
-	}
-	var tt Timetable
-	err := s.Driver.First(&tt).Where("chat_id == ?", chatID).Error
-	if err != nil {
-		return Timetable{}, err
+		return []Subject{}, err
 	}
 
-	return tt, nil
+	var tt Timetable
+	var subjects []Subject
+
+	if err := s.Driver.First(&tt).
+		Where(
+			"chat_id == ? AND name == ? AND week == ?",
+			ttFind.ChatID, ttFind.Name, ttFind.Week).Error; err != nil {
+		return []Subject{}, err
+	}
+
+	if err := s.Driver.Find(&subjects).
+		Order("time DESC"). // TODO
+		Where("tt_id == ?", tt.ID).
+		Error; err != nil {
+		return []Subject{}, err
+	}
+
+	return subjects, nil
 }
 
-func (s *Store) GetGroupAll(chatID string) ([]Timetable, error) {
+func (s *Store) GetTimeTableAll() ([]Timetable, error) {
 	if err := s.Open(); err != nil {
 		return []Timetable{}, err
 	}
 
-	var groups []Timetable
-	err := s.Driver.Find(&groups).Error
+	var tts []Timetable
+	err := s.Driver.Find(&tts).Error
 	if err != nil {
 		return []Timetable{}, err
 	}
-	return groups, nil
+	return tts, nil
 }

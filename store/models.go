@@ -1,6 +1,10 @@
 package store
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type REST struct {
 	Message string `json:"message"`
@@ -12,12 +16,14 @@ type Timetable struct {
 	ChatID   string
 	Name     string
 	Week     string
-	Subjects []Subject `gorm:"foreignKey:ID"`
+	Subjects []Subject `gorm:"foreignKey:TTID;"`
 }
 
 type Subject struct {
 	gorm.Model
-	Title   string `json:"title"`
-	Office  string `json:"office"`
-	Teacher string `json:"teacher"`
+	TTID    uint      `json:"tt_id"`
+	Time    time.Time `json:"time"`
+	Title   string    `json:"title"`
+	Office  string    `json:"office"`
+	Teacher string    `json:"teacher"`
 }

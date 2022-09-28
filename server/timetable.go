@@ -8,39 +8,86 @@ import (
 	"github.com/rombintu/timeshibot-backend/tools"
 )
 
-func (s *Server) Timetable() gin.HandlerFunc {
+func (s *Server) TimetableGET() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		chatID := c.Param("chat_id")
+		week := c.Param("week")
+		day := c.Param("day")
 		action := c.Param("action")
 
-		if action == "create" {
-			if err := s.Store.CreateGroup(chatID); err != nil {
-				c.JSON(http.StatusInternalServerError, store.REST{
-					Message: err.Error(), Error: 1},
-				)
-				return
+		switch action {
+		case tools.Get:
+			ttFind := store.Timetable{
+				ChatID: chatID,
+				Name:   day,
+				Week:   week,
 			}
-		} else if action == "get" {
-			group, err := s.Store.GetGroup(chatID)
+			tts, err := s.Store.GetTimeTable(ttFind)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, store.REST{
 					Message: err.Error(), Error: 1},
 				)
 				return
 			}
-			c.JSON(http.StatusOK, group)
+			c.JSON(http.StatusOK, tts)
 			return
-		} else if action == "all" {
-			groups, err := s.Store.GetGroupAll(chatID)
+		case tools.All: // DEV
+			tts, err := s.Store.GetTimeTableAll()
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, store.REST{
 					Message: err.Error(), Error: 1},
 				)
 				return
 			}
-			c.JSON(http.StatusOK, groups)
+			c.JSON(http.StatusOK, tts)
 			return
-		} else {
+		default:
+			c.JSON(http.StatusBadGateway, store.REST{
+				Message: tools.NotFound, Error: 1},
+			)
+			return
+		}
+	}
+}
+
+func (s *Server) TimetablePOST() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		chatID := c.Param("chat_id")
+		week := c.Param("week")
+		day := c.Param("day")
+		action := c.Param("action")
+
+		var subjects []store.Subject
+
+		if err := c.Bind(&subjects); err != nil {
+			c.JSON(http.StatusInternalServerError, store.REST{
+				Message: err.Error(), Error: 2},
+			)
+			return
+		}
+
+		tt := store.Timetable{
+			ChatID: chatID,
+			Name:   day,
+			Week:   week,
+		}
+
+		switch action {
+		case tools.Create:
+			if err := s.Store.CreateOrUpdateTimeTable(tt, subjects); err != nil {
+				c.JSON(http.StatusInternalServerError, store.REST{
+					Message: err.Error(), Error: 1},
+				)
+				return
+			}
+		// case tools.Update:
+		// 	if err := s.Store.UpdateTimeTable(tt, subjects); err != nil {
+		// 		c.JSON(http.StatusInternalServerError, store.REST{
+		// 			Message: err.Error(), Error: 1},
+		// 		)
+		// 		return
+		// 	}
+		default:
 			c.JSON(http.StatusBadGateway, store.REST{
 				Message: tools.NotFound, Error: 1},
 			)
@@ -48,45 +95,7 @@ func (s *Server) Timetable() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, store.REST{
-			Message: tools.Created, Error: 0},
+			Message: tools.Create, Error: 0},
 		)
 	}
 }
-
-// func (s *Server) UpdateDay() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		chatID := c.Param("chat_id")
-// 		week, err := strconv.Atoi(c.Param("week"))
-// 		if err != nil {
-// 			c.JSON(http.StatusBadRequest, store.REST{
-// 				Message: err.Error(), Error: 1},
-// 			)
-// 			return
-// 		}
-// 		day, err := strconv.Atoi(c.Param("day"))
-// 		if err != nil {
-// 			c.JSON(http.StatusBadRequest, store.REST{
-// 				Message: err.Error(), Error: 1},
-// 			)
-// 			return
-// 		}
-// 		var subjects []store.Subject
-
-// 		if err := c.BindJSON(&subjects); err != nil {
-// 			c.JSON(http.StatusBadRequest, store.REST{
-// 				Message: err.Error(), Error: 1},
-// 			)
-// 			return
-// 		}
-
-// 		// if err := s.Store.UpdateDay(chatID, week, day, subjects); err != nil {
-// 		// 	c.JSON(http.StatusInternalServerError, store.REST{
-// 		// 		Message: err.Error(), Error: 1},
-// 		// 	)
-// 		// 	return
-// 		// }
-// 		c.JSON(http.StatusOK, store.REST{
-// 			Message: tools.Updated, Error: 0},
-// 		)
-// 	}
-// }

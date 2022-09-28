@@ -14,10 +14,12 @@ const (
 
 const (
 	ServerIsStarting string = "Server is starting"
-	Created          string = "created"
-	Updated          string = "updated"
-	Deleted          string = "deleted"
+	Create           string = "create"
+	Update           string = "update"
+	Delete           string = "delete"
 	NotFound         string = "not found"
+	Get              string = "get"
+	All              string = "all"
 )
 
 const (
