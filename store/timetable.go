@@ -26,16 +26,20 @@ func (s *Store) GetTimeTable(ttFind Timetable) (Timetable, error) {
 	var tt Timetable
 	var subjects []Subject
 
-	if err := s.Driver.First(&tt).
+	if err := s.Driver.
 		Where(
 			"chat_id == ? AND name == ? AND week == ?",
-			ttFind.ChatID, ttFind.Name, ttFind.Week).Error; err != nil {
+			ttFind.ChatID, ttFind.Name, ttFind.Week).
+		First(&tt).
+		Error; err != nil {
 		return Timetable{}, err
 	}
 
-	if err := s.Driver.Find(&subjects).
-		Order("time DESC"). // TODO
+	if err := s.Driver.
+		Model(&Subject{}).
 		Where("tt_id == ?", tt.ID).
+		Find(&subjects).
+		Order("time DESC"). // TODO
 		Error; err != nil {
 		return Timetable{}, err
 	}

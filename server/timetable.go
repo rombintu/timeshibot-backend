@@ -25,11 +25,13 @@ func (s *Server) TimetableGET() gin.HandlerFunc { // TODO
 			tts, err := s.Store.GetTimeTable(ttFind)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, store.REST{
-					Message: err.Error(), Error: 1},
+					Message: err.Error(), Error: -1},
 				)
 				return
 			}
-			c.JSON(http.StatusOK, tts)
+			c.JSON(http.StatusOK, store.REST{
+				Message: tts, Error: 0,
+			})
 			return
 		// case tools.All: // DEV
 		// 	tts, err := s.Store.GetTimeTableAll()
@@ -43,7 +45,7 @@ func (s *Server) TimetableGET() gin.HandlerFunc { // TODO
 		// 	return
 		default:
 			c.JSON(http.StatusBadGateway, store.REST{
-				Message: tools.NotFound, Error: 1},
+				Message: tools.NotFound, Error: -1},
 			)
 			return
 		}

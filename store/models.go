@@ -7,8 +7,8 @@ import (
 )
 
 type REST struct {
-	Message string `json:"message"`
-	Error   int    `json:"error"`
+	Message interface{} `json:"message"`
+	Error   int         `json:"error"`
 }
 
 type Timetable struct {
